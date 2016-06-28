@@ -40,8 +40,10 @@ def parse(raw_request)
     params: params
   }
 end
+def display(user)
+  puts "Name: #{user.first_name} #{user.last_name}, Age: #{user.age}"
+end
 
-system('clear')
 user01 = User.new("Rob", "Bor", 23)
 user02 = User.new("Bob", "Bob", 40)
 user03 = User.new("Gob", "Bog", 30)
@@ -69,6 +71,9 @@ users = [user01, user02, user03, user04, user05,
   user16, user17, user18, user19, user20,
   user21
 ]
+
+
+system('clear')
 loop do
   print "Supply a valid HTTP Request URL (h for help, q to quit) > "
   raw_request = gets.chomp
@@ -95,27 +100,25 @@ loop do
             if @params[:offset].nil?
               if @params[:first_name].nil?
                 users.count.times do |i|
-                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  display(users[i])
                 end
               else
                 users.count.times do |i|
                   if users[i].first_name[0].downcase == @params[:first_name]
-                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                    display(users[i])
                   end
                 end
               end
             else
-              @params[:offset].to_i.times do |i|
-                users.shift
-              end
+              shifted_users = users[@params[:offset].to_i..-1]
               if @params[:first_name].nil?
                 users.count.times do |i|
-                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  display(shifted_users[i])
                 end
               else
                 users.count.times do |i|
                   if users[i].first_name[0].downcase == @params[:first_name]
-                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                    display(shifted_users[i])
                   end
                 end
               end
@@ -124,27 +127,25 @@ loop do
             if @params[:offset].nil?
               if @params[:first_name].nil?
                 @params[:limit].to_i.times do |i|
-                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  display(users[i])
                 end
               else
                 @params[:limit].to_i.times do |i|
                   if users[i].first_name[0].downcase == @params[:first_name]
-                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                    display(users[i])
                   end
                 end
               end
             else
-              @params[:offset].to_i.times do |i|
-                users.shift
-              end
+              shifted_users = users[@params[:offset].to_i..-1]
               if @params[:first_name].nil?
                 @params[:limit].to_i.times do |i|
-                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  display(shifted_users[i])
                 end
               else
                 @params[:limit].to_i.times do |i|
                   if users[i].first_name[0].downcase == @params[:first_name]
-                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                    display(shifted_users[i])
                   end
                 end
               end
@@ -153,10 +154,10 @@ loop do
         elsif (1..20).include?(@params[:id].to_i)
           puts "200 OK"
           puts
-          display = users[@params[:id].to_i - 1]
-          puts "name: #{display.first_name} #{display.last_name}, age: #{display.age}"
+          display(users[@params[:id].to_i - 1])
         else
           puts "INVALID REQUEST - 404 NOT FOUND"
+          puts
         end
       end
     elsif @request[:method] == "DELETE"
@@ -164,7 +165,7 @@ loop do
       index = user - 1
       puts "200 OK"
       puts
-      puts "user #{user} #{users[index].first_name} #{users[index].last_name} has been removed from the user list"
+      puts "User ##{user} (#{users[index].first_name} #{users[index].last_name}) has been removed from the user list."
       users.delete_at(index)
     end
     # YOUR CODE GOES ABOVE HERE  ^
