@@ -56,11 +56,20 @@ def display_each(users)
     display(users[i])
   end
 end
+
 def display_each_first(users, params)
   users.count.times do |i|
     if users[i].first_name[0].downcase == params[:first_name]
       display(users[i])
     end
+  end
+end
+
+def first_or_full(users, params)
+  if params[:first_name].nil?
+    display_each(users)
+  else
+    display_each_first(users, params)
   end
 end
 
@@ -119,18 +128,10 @@ loop do
           puts
           if @params[:limit].nil?
             if @params[:offset].nil?
-              if @params[:first_name].nil?
-                display_each(users)
-              else
-                display_each_first(users, @params)
-              end
+              first_or_full(users, @params)
             else
               shifted_users = users[@params[:offset].to_i..-1]
-              if @params[:first_name].nil?
-                display_each(users)
-              else
-                display_each_first(users, @params)
-              end
+              first_or_full(shifted_users, @params)
             end
           else
             if @params[:offset].nil?
