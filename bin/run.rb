@@ -79,25 +79,87 @@ loop do
     user18 = User.new("Bil", "Lib", 48)
     user19 = User.new("Lin", "Nil", 58)
     user20 = User.new("Rey", "Yer", 52)
+    user21 = User.new("Stu", "Uts", 66)
     users = [user01, user02, user03, user04, user05,
       user06, user07, user08, user09, user10,
       user11, user12, user13, user14, user15,
-      user16, user17, user18, user19, user20
+      user16, user17, user18, user19, user20,
+      user21
     ]
-    if @params[:resource]=="users"
-      if @params[:id].nil?
-        puts "200 OK"
-        puts
-        users.each do |user|
-          puts "name: #{user.first_name} #{user.last_name}, age: #{user.age}"
+    if @request[:method] == "GET"
+      if @params[:resource]=="users"
+        if @params[:id].nil?
+          puts "200 OK"
+          puts
+          if @params[:limit].nil?
+            if @params[:offset].nil?
+              if @params[:first_name].nil?
+                users.count.times do |i|
+                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                end
+              else
+                users.count.times do |i|
+                  if users[i].first_name[0].downcase == @params[:first_name]
+                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  end
+                end
+              end
+            else
+              @params[:offset].to_i.times do |i|
+                users.shift
+              end
+              if @params[:first_name].nil?
+                users.count.times do |i|
+                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                end
+              else
+                users.count.times do |i|
+                  if users[i].first_name[0].downcase == @params[:first_name]
+                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  end
+                end
+              end
+            end
+          else
+            if @params[:offset].nil?
+              if @params[:first_name].nil?
+                @params[:limit].to_i.times do |i|
+                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                end
+              else
+                @params[:limit].to_i.times do |i|
+                  if users[i].first_name[0].downcase == @params[:first_name]
+                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  end
+                end
+              end
+            else
+              @params[:offset].to_i.times do |i|
+                users.shift
+              end
+              if @params[:first_name].nil?
+                @params[:limit].to_i.times do |i|
+                  puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                end
+              else
+                @params[:limit].to_i.times do |i|
+                  if users[i].first_name[0].downcase == @params[:first_name]
+                    puts "name: #{users[i].first_name} #{users[i].last_name}, age: #{users[i].age}"
+                  end
+                end
+              end
+            end
+          end
+        elsif (1..20).include?(@params[:id].to_i)
+          puts "200 OK"
+          puts
+          display = users[@params[:id].to_i - 1]
+          puts "name: #{display.first_name} #{display.last_name}, age: #{display.age}"
+        else
+          puts "INVALID REQUEST - 404 NOT FOUND"
         end
-      elsif (1..20).include?(@params[:id].to_i)
-        puts "200 OK"
-        puts
-        puts users[@params[:id].to_i - 1]
-      else
-        puts "INVALID REQUEST - 404 NOT FOUND"
       end
+    else
     end
     # YOUR CODE GOES ABOVE HERE  ^
   end
