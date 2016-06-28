@@ -1,4 +1,5 @@
 require_relative '../db/setup'
+require_relative '../lib/user'
 # Remember to put the requires here for all the classes you write and want to use
 
 def parse_params(uri_fragments, query_param_string)
@@ -58,7 +59,46 @@ loop do
     # return an appropriate response
 
     # YOUR CODE GOES BELOW HERE
-    puts @request
+    user01 = User.new("Rob", "Bor", 23)
+    user02 = User.new("Bob", "Bob", 40)
+    user03 = User.new("Gob", "Bog", 30)
+    user04 = User.new("Tom", "Mot", 25)
+    user05 = User.new("Tim", "Mit", 19)
+    user06 = User.new("Jim", "Mij", 35)
+    user07 = User.new("Pam", "Map", 50)
+    user08 = User.new("Jan", "Naj", 42)
+    user09 = User.new("Sam", "Mas", 28)
+    user10 = User.new("Zed", "Dez", 25)
+    user11 = User.new("Ted", "Det", 48)
+    user12 = User.new("Syd", "Dys", 37)
+    user13 = User.new("Lee", "Eel", 25)
+    user14 = User.new("Zoe", "Eoz", 38)
+    user15 = User.new("Jud", "Duj", 43)
+    user16 = User.new("Mat", "Tam", 26)
+    user17 = User.new("Jon", "Noj", 21)
+    user18 = User.new("Bil", "Lib", 48)
+    user19 = User.new("Lin", "Nil", 58)
+    user20 = User.new("Rey", "Yer", 52)
+    users = [user01, user02, user03, user04, user05,
+      user06, user07, user08, user09, user10,
+      user11, user12, user13, user14, user15,
+      user16, user17, user18, user19, user20
+    ]
+    if @params[:resource]=="users"
+      if @params[:id].nil?
+        puts "200 OK"
+        puts
+        users.each do |user|
+          puts "name: #{user.first_name} #{user.last_name}, age: #{user.age}"
+        end
+      elsif (1..20).include?(@params[:id].to_i)
+        puts "200 OK"
+        puts
+        puts users[@params[:id].to_i - 1]
+      else
+        puts "INVALID REQUEST - 404 NOT FOUND"
+      end
+    end
     # YOUR CODE GOES ABOVE HERE  ^
   end
 end
