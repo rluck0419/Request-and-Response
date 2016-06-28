@@ -43,6 +43,27 @@ end
 def display(user)
   puts "Name: #{user.first_name} #{user.last_name}, Age: #{user.age}"
 end
+def delete(params, users)
+  user = params[:id].to_i
+  index = user - 1
+  puts "200 OK"
+  puts
+  puts "User ##{user} (#{users[index].first_name} #{users[index].last_name}) has been removed from the user list."
+  users.delete_at(index)
+end
+def display_each(users)
+  users.count.times do |i|
+    display(users[i])
+  end
+end
+def display_each_first(users, params)
+  users.count.times do |i|
+    if users[i].first_name[0].downcase == params[:first_name]
+      display(users[i])
+    end
+  end
+end
+
 
 user01 = User.new("Rob", "Bor", 23)
 user02 = User.new("Bob", "Bob", 40)
@@ -92,35 +113,23 @@ loop do
 
     # YOUR CODE GOES BELOW HERE
     if @request[:method] == "GET"
-      if @params[:resource]=="users"
+      if @params[:resource] == "users"
         if @params[:id].nil?
           puts "200 OK"
           puts
           if @params[:limit].nil?
             if @params[:offset].nil?
               if @params[:first_name].nil?
-                users.count.times do |i|
-                  display(users[i])
-                end
+                display_each(users)
               else
-                users.count.times do |i|
-                  if users[i].first_name[0].downcase == @params[:first_name]
-                    display(users[i])
-                  end
-                end
+                display_each_first(users, @params)
               end
             else
               shifted_users = users[@params[:offset].to_i..-1]
               if @params[:first_name].nil?
-                users.count.times do |i|
-                  display(shifted_users[i])
-                end
+                display_each(users)
               else
-                users.count.times do |i|
-                  if users[i].first_name[0].downcase == @params[:first_name]
-                    display(shifted_users[i])
-                  end
-                end
+                display_each_first(users, @params)
               end
             end
           else
@@ -161,13 +170,12 @@ loop do
         end
       end
     elsif @request[:method] == "DELETE"
-      user = @params[:id].to_i
-      index = user - 1
-      puts "200 OK"
-      puts
-      puts "User ##{user} (#{users[index].first_name} #{users[index].last_name}) has been removed from the user list."
-      users.delete_at(index)
+      delete(@params, users)
     end
     # YOUR CODE GOES ABOVE HERE  ^
   end
 end
+
+# methods for GET, DELETE, nil?'s
+# getting info separate from puts at end
+# filtering later before puts
