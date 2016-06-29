@@ -124,6 +124,17 @@ def first_or_full(users, params, first)
   end
 end
 
+def get(users, params, first)
+  if params[:id].nil?
+    ok_200
+    display_full_or_limited(users, params, first)
+  elsif (1..users.count).include?(params[:id].to_i)
+    display_user(users, params)
+  else
+    invalid_404
+  end
+end
+
 def ok_200
   puts "200 OK"
   puts
@@ -182,24 +193,18 @@ loop do
     # return an appropriate response
 
     # YOUR CODE GOES BELOW HERE
-    if @request[:method] == "GET"
-      if @params[:resource] == "users"
-        if @params[:id].nil?
-          ok_200
-          first = false
-          display_full_or_limited(users, @params, first)
-        elsif (1..20).include?(@params[:id].to_i)
-          display_user(users, @params)
-        else
-          invalid_404
-        end
-      end
-    elsif @request[:method] == "DELETE"
-      if @params[:resource] == "users"
+    if @params[:resource] == "users"
+      if @request[:method] == "GET"
+        first = false
+        get(users, @params, first)
+      elsif @request[:method] == "DELETE"
         delete(@params, users)
+      else
+        invalid_404
       end
+    else
+      invalid_404
     end
-    # YOUR CODE GOES ABOVE HERE  ^
   end
 end
 
