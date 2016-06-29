@@ -48,10 +48,14 @@ end
 def delete(params, users)
   user = params[:id].to_i
   index = user - 1
-  puts "200 OK"
-  puts
+  ok_200
   puts "User ##{user} (#{users[index].first_name} #{users[index].last_name}) has been removed from the user list."
   users.delete_at(index)
+end
+
+def display_user(users, params)
+  ok_200
+  display(users[@params[:id].to_i - 1])
 end
 
 def display_each(users)
@@ -68,7 +72,7 @@ def display_each_first(users, params)
   end
 end
 
-def full_or_first(users, params)
+def display_first_or_full(users, params)
   if params[:first_name].nil?
     display_each(users)
   else
@@ -76,12 +80,12 @@ def full_or_first(users, params)
   end
 end
 
-def full_or_offset(users, params)
+def display_full_or_offset(users, params, first)
   if params[:offset].nil?
-    full_or_first(users, params)
+     display_first_or_full(users, params)
   else
     shifted_users = users[params[:offset].to_i..-1]
-    full_or_first(shifted_users, params)
+     display_first_or_full(shifted_users, params)
   end
 end
 
@@ -110,6 +114,16 @@ def first_or_full(users, params, first)
     first = true
     display_each_limited(users, @params, first)
   end
+end
+
+def ok_200
+  puts "200 OK"
+  puts
+end
+
+def invalid_404
+  puts "INVALID REQUEST - 404 NOT FOUND"
+  puts
 end
 
 
@@ -163,30 +177,23 @@ loop do
     if @request[:method] == "GET"
       if @params[:resource] == "users"
         if @params[:id].nil?
-          puts "200 OK"
-          puts
+          ok_200
+          first = false
           if @params[:limit].nil?
-            full_or_offset(users, @params)
+            display_full_or_offset(users, @params, first)
           else
-            first = false
-            if @params[:offset].nil?
-              first_or_full(users, @params, first)
-            else
-              shifted_users = users[@params[:offset].to_i..-1]
-              first_or_full(shifted_users, @params, first)
-            end
+            display_full_or_offset(users, @params, first)
           end
         elsif (1..20).include?(@params[:id].to_i)
-          puts "200 OK"
-          puts
-          display(users[@params[:id].to_i - 1])
+          display_user(users, @params)
         else
-          puts "INVALID REQUEST - 404 NOT FOUND"
-          puts
+          invalid_404
         end
       end
     elsif @request[:method] == "DELETE"
-      delete(@params, users)
+      if @params[:resource] == "users"
+        delete(@params, users)
+      end
     end
     # YOUR CODE GOES ABOVE HERE  ^
   end
