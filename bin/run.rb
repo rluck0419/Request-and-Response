@@ -40,9 +40,11 @@ def parse(raw_request)
     params: params
   }
 end
+
 def display(user)
   puts "Name: #{user.first_name} #{user.last_name}, Age: #{user.age}"
 end
+
 def delete(params, users)
   user = params[:id].to_i
   index = user - 1
@@ -51,6 +53,7 @@ def delete(params, users)
   puts "User ##{user} (#{users[index].first_name} #{users[index].last_name}) has been removed from the user list."
   users.delete_at(index)
 end
+
 def display_each(users)
   users.count.times do |i|
     display(users[i])
@@ -65,11 +68,47 @@ def display_each_first(users, params)
   end
 end
 
-def first_or_full(users, params)
+def full_or_first(users, params)
   if params[:first_name].nil?
     display_each(users)
   else
     display_each_first(users, params)
+  end
+end
+
+def full_or_offset(users, params)
+  if params[:offset].nil?
+    full_or_first(users, params)
+  else
+    shifted_users = users[params[:offset].to_i..-1]
+    full_or_first(shifted_users, params)
+  end
+end
+
+def display_limited_first(users, params, index)
+  if users[index].first_name[0].downcase == params[:first_name]
+    display(users[index])
+  end
+end
+
+def display_each_limited(users, params, first)
+  if first
+    params[:limit].to_i.times do |i|
+      display_limited_first(users, params, i)
+    end
+  else
+    params[:limit].to_i.times do |i|
+      display(users[i])
+    end
+  end
+end
+
+def first_or_full(users, params, first)
+  if params[:first_name].nil?
+    display_each_limited(users, @params, first)
+  else
+    first = true
+    display_each_limited(users, @params, first)
   end
 end
 
@@ -127,38 +166,14 @@ loop do
           puts "200 OK"
           puts
           if @params[:limit].nil?
-            if @params[:offset].nil?
-              first_or_full(users, @params)
-            else
-              shifted_users = users[@params[:offset].to_i..-1]
-              first_or_full(shifted_users, @params)
-            end
+            full_or_offset(users, @params)
           else
+            first = false
             if @params[:offset].nil?
-              if @params[:first_name].nil?
-                @params[:limit].to_i.times do |i|
-                  display(users[i])
-                end
-              else
-                @params[:limit].to_i.times do |i|
-                  if users[i].first_name[0].downcase == @params[:first_name]
-                    display(users[i])
-                  end
-                end
-              end
+              first_or_full(users, @params, first)
             else
               shifted_users = users[@params[:offset].to_i..-1]
-              if @params[:first_name].nil?
-                @params[:limit].to_i.times do |i|
-                  display(shifted_users[i])
-                end
-              else
-                @params[:limit].to_i.times do |i|
-                  if users[i].first_name[0].downcase == @params[:first_name]
-                    display(shifted_users[i])
-                  end
-                end
-              end
+              first_or_full(shifted_users, @params, first)
             end
           end
         elsif (1..20).include?(@params[:id].to_i)
