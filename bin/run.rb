@@ -80,12 +80,20 @@ def display_first_or_full(users, params)
   end
 end
 
+def display_full_or_limited(users, params, first)
+  if params[:limit].nil?
+    display_full_or_offset(users, params, first)
+  else
+    display_full_or_offset(users, params, first)
+  end
+end
+
 def display_full_or_offset(users, params, first)
   if params[:offset].nil?
      display_first_or_full(users, params)
   else
     shifted_users = users[params[:offset].to_i..-1]
-     display_first_or_full(shifted_users, params)
+    display_first_or_full(shifted_users, params)
   end
 end
 
@@ -179,11 +187,7 @@ loop do
         if @params[:id].nil?
           ok_200
           first = false
-          if @params[:limit].nil?
-            display_full_or_offset(users, @params, first)
-          else
-            display_full_or_offset(users, @params, first)
-          end
+          display_full_or_limited(users, @params, first)
         elsif (1..20).include?(@params[:id].to_i)
           display_user(users, @params)
         else
